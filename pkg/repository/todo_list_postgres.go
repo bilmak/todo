@@ -79,7 +79,7 @@ func (r *TodoListPostgres) Update(userId, listId int, input todo.UpdateListInput
 	argId := 1
 
 	if input.Title != nil {
-		setValues = append(setValues, fmt.Sprintf("title= %d", argId))
+		setValues = append(setValues, fmt.Sprintf("title= $%d", argId))
 		args = append(args, *input.Title)
 		argId++
 	}
