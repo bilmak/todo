@@ -1,8 +1,12 @@
 port : "8000"
 
+salt: "sabrina1234"
+singingKey: "123rfv"
+
 db:
   host: "localhost"
   port: "51516"
   username: "postgres"
   dbName:   "postgres"
   sslmode:  "disable"
+

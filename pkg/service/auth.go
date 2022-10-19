@@ -12,8 +12,6 @@ import (
 )
 
 const (
-	salt       = "sabrina1234"
-	singingKey = "123rfv"
 	tokenTTL   = 12 * time.Hour
 )
 
@@ -23,21 +21,25 @@ type tokenClaims struct {
 }
 type AuthService struct {
 	repo repository.Authorization
+	salt string
+	singingKey string
+
 }
 
-func NewAuthService(repo repository.Authorization) *AuthService {
-	return &AuthService{repo: repo}
+func NewAuthService(repo repository.Authorization, salt string, singingKey string) *AuthService {
+
+	return &AuthService{repo: repo, salt:  salt, singingKey: singingKey}
 }
 
 func (s *AuthService) CreateUser(user todo.User) (int, error) {
-	user.Password = generatePasswordHash(user.Password)
+	user.Password = generatePasswordHash(user.Password, s.salt, s.singingKey)
 
 	return s.repo.CreateUser(user)
 
 }
 
 func (s *AuthService) GenerateToken(username, password string) (string, error) {
-	user, err := s.repo.GetUser(username, generatePasswordHash(password))
+	user, err := s.repo.GetUser(username, generatePasswordHash(password, s.salt, s.singingKey))
 
 	if err != nil {
 		return "", err
@@ -51,11 +53,11 @@ func (s *AuthService) GenerateToken(username, password string) (string, error) {
 		user.Id,
 	})
 
-	return token.SignedString([]byte(singingKey))
+	return token.SignedString([]byte(s.singingKey))
 
 }
 
-func generatePasswordHash(password string) string {
+func generatePasswordHash(password string, salt string, singingKey string ) string {
 	hash := sha1.New()
 	hash.Write([]byte(password))
 
@@ -67,7 +69,7 @@ func (s *AuthService) ParseToken(accessToken string) (int, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, errors.New("invalid signing method")
 		}
-		return []byte(singingKey), nil
+		return []byte(s.singingKey), nil
 	})
 	if err != nil {
 		return 0, err

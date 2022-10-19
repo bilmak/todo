@@ -33,9 +33,9 @@ type Service struct {
 	TodoItem
 }
 
-func NewService(repos *repository.Repository) *Service {
+func NewService(repos *repository.Repository, salt string, singingKey string) *Service {
 	return &Service{
-		Authorization: NewAuthService(repos.Authorization),
+		Authorization: NewAuthService(repos.Authorization, salt, singingKey),
 		TodoList:      NewTodoListService(repos.TodoList),
 		TodoItem: NewTodoItemService(repos.TodoItem, repos.TodoList),
 	}

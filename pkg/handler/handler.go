@@ -1,8 +1,12 @@
 package handler
 
 import (
+	_ "github.com/bilmak/todo-app/docs"
 	"github.com/bilmak/todo-app/pkg/service"
 	"github.com/gin-gonic/gin"
+	ginSwagger "github.com/swaggo/gin-swagger"
+	swaggerfiles "github.com/swaggo/files"
+	
 )
 
 type Handler struct {
@@ -15,6 +19,8 @@ func NewHandler(services *service.Service) *Handler {
 
 func (h *Handler) InitRoutes() *gin.Engine {
 	router := gin.New()
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
+	
 
 	auth := router.Group("/auth")
 	{

@@ -13,16 +13,16 @@ import (
 	"github.com/spf13/viper"
 )
 
-// @title Todo App API
-// @version 1.0
+// @title       Sabrina Todo App API
+// @version     1.0
 // @description API Server for TodoList Application
 
-// @host localhost:8000
+// @host     localhost:8000
 // @BasePath /
 
 // @securityDefinitions.apikey ApiKeyAuth
-// @in header
-// @name Authorization
+// @in                         header
+// @name                       Authorization
 func main() {
 	logrus.SetFormatter(new(logrus.JSONFormatter))
 
@@ -30,7 +30,7 @@ func main() {
 		logrus.Fatalf("error initalization config: %s", err.Error())
 	}
 
-	if err := godotenv.Load(); err !=nil{
+	if err := godotenv.Load(); err != nil {
 		logrus.Fatalf("error loading env variables: %s", err.Error())
 	}
 
@@ -46,9 +46,10 @@ func main() {
 	if err != nil {
 		logrus.Fatalf("faild to initializate db:%s", err.Error())
 	}
-
+	salt := viper.GetString("salt")
+	singingKey := viper.GetString("singingKey")
 	repos := repository.NewRepository(db)
-	services := service.NewService(repos)
+	services := service.NewService(repos, salt, singingKey )
 	handlers := handler.NewHandler(services)
 
 	srv := new(todo.Server)
